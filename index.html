@@ -72,8 +72,6 @@ index.controller('IndexController', ['$http', '$location', '$rootScope', functio
 
     if (this.path = window.localStorage.getItem('lastPath')) {
         $location.path(this.path);
-    } else {
-        this.path_parts = path_parts(this.path = $location.path());
     }
 
     this.open_folder = function (branch) {
@@ -105,7 +103,7 @@ index.controller('IndexController', ['$http', '$location', '$rootScope', functio
 
         $http({
             method: 'GET',
-            url: 'http/' + path
+            url: 'http/' + (path || '')
         }).then(function (response) {
             var files = response.data || [];
 
@@ -130,8 +128,6 @@ index.controller('IndexController', ['$http', '$location', '$rootScope', functio
         }
         return parts;
     };
-
-    load_folder(this.path);
 }]);
 index.filter('humanize', function () {
     return function humanize(number) {
