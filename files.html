@@ -81,7 +81,7 @@ index.controller('IndexController', ['$http', '$location', '$scope', function ($
 
         $http({
             method: 'GET',
-            url: path || '/'
+            url: 'http/' + path
         }).then(function (response) {
             var files = response.data || [], file;
             for (var i = 0, l = files.length; i < l; i++) {
