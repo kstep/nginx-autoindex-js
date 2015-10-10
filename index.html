@@ -142,7 +142,7 @@ index.controller('IndexController', ['$http', '$location', '$rootScope', '$windo
 
     function load_folder(path) {
         self.error = null;
-        self.chosen = 0;
+        self.chosen = -1;
 
         $http({
             method: 'GET',
