@@ -82,6 +82,10 @@ index.controller('IndexController', ['$http', '$location', '$rootScope', '$windo
     }
 
     this.open_folder = function (branch) {
+        if (!branch) {
+            return false;
+        }
+
         if (branch.type == 'directory') {
             if (self.path == '/') {
                 $location.path('/' + branch.name);
