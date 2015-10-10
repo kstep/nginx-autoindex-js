@@ -1,0 +1,115 @@
+<!DOCTYPE HTML>
+<html>
+    <head>
+        <script src="/tree-grid/lib/angular.min.js"></script>
+        <script src="/tree-grid/src/tree-grid-directive.js"></script>
+
+        <script src="/tree-grid/lib/jquery-2.1.4.min.js"></script>
+        <script src="/tree-grid/lib/bootstrap.min.js"></script>
+
+        <link type="text/css" rel="stylesheet" href="/tree-grid/src/treeGrid.css" />
+        <link type="text/css" rel="stylesheet" href="/tree-grid/lib/bootstrap.min.css" />
+    </head>
+    <body ng-controller="IndexController as index" style="margin: 10px 20px">
+        <div class="container-fluid">
+            <div class="row">
+                <ol class="breadcrumb">
+                    <li><a ng-hide="index.path == '' || index.path == '/'" href="" ng-click="index.go_up()"><i class="glyphicon glyphicon-arrow-up"></i></a></li>
+                    <li ng-class="{'active': $last}" ng-repeat="part in index.path_parts"><span ng-if="$last">{{ part.name }}</span><a ng-if="!$last" href="#{{ part.path }}">{{ part.name }}</a></li>
+                </ol>
+            </div>
+
+            <div class="row">
+                <tree-grid tree-data="index.files" col-defs="index.columns" expand-on="index.header_column" on-select="index.open_folder(branch)" on-click="index.open_folder(branch)" icon-expand="glyphicon glyphicon-folder-close" icon-collapse="glyphicon glyphicon-folder-open"></tree-grid>
+            </div>
+        </div>
+        <script>
+var index = angular.module('index', ['ng', 'treeGrid']);
+index.controller('IndexController', ['$http', '$location', '$rootScope', function ($http, $location, $scope) {
+    var self = this;
+
+    $scope.$on('$locationChangeSuccess', function () {
+        self.path_parts = path_parts(self.path = $location.path());
+        load_folder(self.path);
+    });
+
+    this.path_parts = path_parts(this.path = $location.path());
+
+    this.open_folder = function (branch) {
+        if (branch.type == 'directory') {
+            if (self.path == '/') {
+                $location.path('/' + branch.name);
+            } else {
+                $location.path(self.path + '/' + branch.name);
+            }
+        }
+    };
+    this.header_column = {
+        field: 'name',
+        displayName: 'Name',
+        filterable: true,
+        sortable: true
+    };
+    this.columns = [
+        { field: 'name', displayName: 'Link', cellTemplate: '<a ng-href="{{ cellTemplateScope.index.path }}/{{ row.branch[col.field] }}" ng-if="row.branch.type != \'directory\'">direct link →</a>', cellTemplateScope: {index: this} },
+        { field: 'mtime', displayName: 'Time', sortable: true, cellTemplate: '<span ng-bind=\'row.branch[col.field] | date:"short"\'</span>', sortingType: 'date' },
+        { field: 'size', displayName: 'Size', sortable: true, sortingType: 'number', cellTemplate: '<span title="{{ row.branch[col.field] }}" ng-bind="row.branch[col.field] | humanize"></span>' }
+    ];
+    this.files = [];
+
+    this.go_up = function () {
+        var lastSlash = self.path.lastIndexOf('/');
+        if (lastSlash < 0) {
+            $location.path('');
+        } else {
+            $location.path(self.path.substring(0, lastSlash));
+        }
+    };
+
+    function load_folder(path) {
+        $http({
+            method: 'GET',
+            url: path || '/'
+        }).then(function (response) {
+            var files = response.data || [], file;
+            for (var i = 0, l = files.length; i < l; i++) {
+                file = files[i];
+                file.mtime = new Date(file.mtime);
+                if (file.type == 'directory') {
+                    file.children = [{name: 'loading...'}];
+                }
+            }
+
+            self.files = files;
+        });
+    }
+    function path_parts(path) {
+        var parts = (path == '/'? '': path).split('/'), up = '', path;
+        for (var i = 0, l = parts.length; i < l; i++) {
+            path = up + parts[i];
+            up = path + '/';
+            parts[i] = { path: path, name: parts[i] || '‹root›' };
+        }
+        return parts;
+    };
+
+    load_folder(this.path);
+}]);
+index.filter('humanize', function () {
+    return function humanize(number) {
+        if(number < 1024) {
+            return number + ' bytes';
+        }
+        var si = ['K', 'M', 'G', 'T', 'P', 'H'];
+        var exp = Math.floor(Math.log(number) / Math.log(1024));
+        var result = number / Math.pow(1024, exp);
+        result = (result % 1 > (1 / Math.pow(1024, exp - 1))) ? result.toFixed(2) : result.toFixed(0);
+        return result + ' ' + si[exp - 1] + 'ib';
+    };
+});
+angular.element(document).ready(function () {
+    angular.bootstrap(document, ['index']);
+});
+        </script>
+    </body>
+</html>
