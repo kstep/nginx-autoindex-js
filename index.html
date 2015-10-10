@@ -3,7 +3,10 @@
     <head>
         <script src="/tree-grid/lib/angular.min.js"></script>
         <link type="text/css" rel="stylesheet" href="/tree-grid/lib/bootstrap.min.css" />
-        <style>.ng-cloak { display: none !important; }</style>
+        <style>
+            .ng-cloak { display: none !important; }
+            table.table tr a { display: block; }
+        </style>
     </head>
     <body ng-controller="IndexController as index" style="margin: 10px 20px">
         <div class="container-fluid ng-cloak">
@@ -18,24 +21,24 @@
                 <div class="table-responsive">
                 <table class="table">
                     <thead>
-                        <th class="col-md-9"><a href="" ng-click="index.toggle_sort('name', false)">Name
+                        <th class="col-md-9"><a ng-click="index.toggle_sort('name', false)" href="">Name
                             <i ng-show="index.sort.name == 'name'" class="glyphicon pull-right" ng-class="index.sort.rev ? 'glyphicon-arrow-up': 'glyphicon-arrow-down'"></i></a>
                         </th>
-                        <th class="col-md-2"><a href="" ng-click="index.toggle_sort('mtime', true)">Time
+                        <th class="col-md-2"><a ng-click="index.toggle_sort('mtime', true)" href="">Time
                             <i ng-show="index.sort.name == 'mtime'" class="glyphicon pull-right" ng-class="index.sort.rev ? 'glyphicon-arrow-up': 'glyphicon-arrow-down'"></i></a>
                         </th>
-                        <th class="col-md-1"><a href="" ng-click="index.toggle_sort('size', false)">Size
+                        <th class="col-md-1"><a ng-click="index.toggle_sort('size', false)" href="">Size
                             <i ng-show="index.sort.name == 'size'" class="glyphicon pull-right" ng-class="index.sort.rev ? 'glyphicon-arrow-up': 'glyphicon-arrow-down'"></i></a>
                         </th>
                     </thead>
                     <tbody>
                         <tr ng-hide="index.path == '' || index.path == '/'">
-                            <td><a href="" ng-click="index.go_up()"><i class="glyphicon glyphicon-level-up"></i> ..</a></td>
+                            <td ng-click="index.go_up()"><a href=""><i class="glyphicon glyphicon-level-up"></i> ..</a></td>
                             <td></td>
                             <td></td>
                         </tr>
                         <tr ng-repeat="row in index.files | orderBy:index.sort.name:index.sort.rev" ng-class="{'active': index.chosen == $index}">
-                            <td ng-click="index.open_folder(row) && $event.preventDefault()"><a href="{{ index.path }}/{{ row.name }}"><i class="glyphicon" ng-class="{'glyphicon-folder-close': row.type == 'directory', 'glyphicon-file': row.type == 'file'}"></i> {{ row.name }}</a></td>
+                            <td><a ng-click="index.open_folder(row) && $event.preventDefault()" href="{{ index.path }}/{{ row.name }}"><i class="glyphicon" ng-class="{'glyphicon-folder-close': row.type == 'directory', 'glyphicon-file': row.type == 'file'}"></i> {{ row.name }}</a></td>
                             <td>{{ row.mtime | date:'short' }}</td>
                             <td><span ng-bind="row.size | humanize" ng-show="row.size"></span></td>
                         </tr>
