@@ -16,7 +16,7 @@
                 <form class="col-md-2 pull-right"><div class="input-group"><span class="input-group-addon"><i class="glyphicon glyphicon-filter"></i></span><input class="form-control" type="search" ng-model="filterString" placeholder="Filter…" /></div></form>
                 <ol class="breadcrumb">
                     <li><a ng-hide="index.path == '' || index.path == '/'" href="" ng-click="index.go_up()"><i class="glyphicon glyphicon-arrow-up"></i></a></li>
-                    <li ng-class="{'active': $last}" ng-repeat="part in index.path_parts"><span ng-if="$last">{{ part.name }}</span><a ng-if="!$last" href="#{{ part.path }}">{{ part.name }}</a></li>
+                    <li ng-class="{'active': $last}" ng-repeat="part in index.path_parts"><span ng-if="$last" ng-bind="part.name"></span><a ng-if="!$last" href="#{{ part.path }}" ng-bind="part.name"></a></li>
                 </ol>
             </div>
 
