@@ -74,7 +74,7 @@ index.controller('IndexController', ['$http', '$location', '$rootScope', functio
         }
     };
 
-    if (this.path = window.localStorage.getItem('lastPath')) {
+    if ($location.path() == '' && (this.path = window.localStorage.getItem('lastPath'))) {
         $location.path(this.path);
     }
 
