@@ -70,7 +70,11 @@ index.controller('IndexController', ['$http', '$location', '$rootScope', functio
         }
     };
 
-    this.path_parts = path_parts(this.path = $location.path());
+    if (this.path = window.localStorage.getItem('lastPath')) {
+        $location.path(this.path);
+    } else {
+        this.path_parts = path_parts(this.path = $location.path());
+    }
 
     this.open_folder = function (branch) {
         if (branch.type == 'directory') {
@@ -111,6 +115,7 @@ index.controller('IndexController', ['$http', '$location', '$rootScope', functio
 
             self.filterString = '';
             self.files = files;
+            window.localStorage.setItem('lastPath', path);
         }, function (response) {
             self.error = response;
         });
