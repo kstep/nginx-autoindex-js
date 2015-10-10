@@ -20,8 +20,17 @@
                 </ol>
             </div>
 
-            <div class="row">
+            <div class="row" ng-hide="index.error">
                 <tree-grid tree-data="index.files" col-defs="index.columns" expand-on="index.header_column" on-select="index.open_folder(branch)" on-click="index.open_folder(branch)" icon-expand="glyphicon glyphicon-folder-close" icon-collapse="glyphicon glyphicon-folder-open"></tree-grid>
+            </div>
+
+            <div class="row" ng-show="index.error">
+                <div class="alert alert-danger" role="alert">
+                    <big>
+                        <strong>Oh snap!</strong>
+                        Error {{ index.error.status }} occurred, and it means “{{ index.error.statusText }}”.
+                    </big>
+                </div>
             </div>
         </div>
         <script>
@@ -68,6 +77,8 @@ index.controller('IndexController', ['$http', '$location', '$scope', function ($
     };
 
     function load_folder(path) {
+        self.error = null;
+
         $http({
             method: 'GET',
             url: path || '/'
@@ -83,6 +94,8 @@ index.controller('IndexController', ['$http', '$location', '$scope', function ($
 
             self.files = files;
             $scope.filterString = '';
+        }, function (response) {
+            self.error = response;
         });
     }
     function path_parts(path) {
