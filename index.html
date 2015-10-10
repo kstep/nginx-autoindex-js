@@ -10,7 +10,6 @@
             <div class="row">
                 <form class="hide col-md-2 pull-right"><div class="input-group"><span class="input-group-addon"><i class="glyphicon glyphicon-filter"></i></span><input class="form-control" type="search" ng-model="index.filterString" placeholder="Filter…" /></div></form>
                 <ol class="breadcrumb">
-                    <li><a ng-hide="index.path == '' || index.path == '/'" href="" ng-click="index.go_up()"><i class="glyphicon glyphicon-arrow-up"></i></a></li>
                     <li ng-class="{'active': $last}" ng-repeat="part in index.path_parts"><span ng-if="$last" ng-bind="part.name"></span><a ng-if="!$last" href="#{{ part.path }}" ng-bind="part.name"></a></li>
                 </ol>
             </div>
@@ -30,6 +29,11 @@
                         </th>
                     </thead>
                     <tbody>
+                        <tr ng-hide="index.path == '' || index.path == '/'">
+                            <td><a href="" ng-click="index.go_up()"><i class="glyphicon glyphicon-level-up"></i> ..</a></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
                         <tr ng-repeat="row in index.files | orderBy:index.sort.name:index.sort.rev">
                             <td ng-click="index.open_folder(row) && $event.preventDefault()"><a href="{{ index.path }}/{{ row.name }}"><i class="glyphicon" ng-class="{'glyphicon-folder-close': row.type == 'directory', 'glyphicon-file': row.type == 'file'}"></i> {{ row.name }}</a></td>
                             <td>{{ row.mtime | date:'short' }}</td>
