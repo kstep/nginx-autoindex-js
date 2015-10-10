@@ -9,7 +9,7 @@
         <div class="container-fluid ng-cloak">
             <div class="row">
                 <ol class="breadcrumb">
-                    <li ng-class="{'active': $last}" ng-repeat="part in index.path_parts"><span ng-if="$last" ng-bind="part.name"></span><a ng-if="!$last" href="#{{ part.path }}" ng-bind="part.name"></a></li>
+                    <li ng-class="{'active': $last}" ng-repeat="part in index.path_parts"><span ng-if="$last">{{ part.name }} <small>({{index.files.length}})</small></span><a ng-if="!$last" href="#{{ part.path }}" ng-bind="part.name"></a></li>
                 </ol>
             </div>
 
