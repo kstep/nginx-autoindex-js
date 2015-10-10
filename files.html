@@ -2,18 +2,13 @@
 <html>
     <head>
         <script src="/tree-grid/lib/angular.min.js"></script>
-        <script src="/tree-grid/src/tree-grid-directive.js"></script>
-
-        <script src="/tree-grid/lib/jquery-2.1.4.min.js"></script>
-        <script src="/tree-grid/lib/bootstrap.min.js"></script>
-
-        <link type="text/css" rel="stylesheet" href="/tree-grid/src/treeGrid.css" />
         <link type="text/css" rel="stylesheet" href="/tree-grid/lib/bootstrap.min.css" />
+        <style>.ng-cloak { display: none !important; }</style>
     </head>
     <body ng-controller="IndexController as index" style="margin: 10px 20px">
-        <div class="container-fluid">
+        <div class="container-fluid ng-cloak">
             <div class="row">
-                <form class="col-md-2 pull-right"><div class="input-group"><span class="input-group-addon"><i class="glyphicon glyphicon-filter"></i></span><input class="form-control" type="search" ng-model="filterString" placeholder="Filter…" /></div></form>
+                <form class="hide col-md-2 pull-right"><div class="input-group"><span class="input-group-addon"><i class="glyphicon glyphicon-filter"></i></span><input class="form-control" type="search" ng-model="index.filterString" placeholder="Filter…" /></div></form>
                 <ol class="breadcrumb">
                     <li><a ng-hide="index.path == '' || index.path == '/'" href="" ng-click="index.go_up()"><i class="glyphicon glyphicon-arrow-up"></i></a></li>
                     <li ng-class="{'active': $last}" ng-repeat="part in index.path_parts"><span ng-if="$last" ng-bind="part.name"></span><a ng-if="!$last" href="#{{ part.path }}" ng-bind="part.name"></a></li>
@@ -21,7 +16,28 @@
             </div>
 
             <div class="row" ng-hide="index.error">
-                <tree-grid tree-data="index.files" col-defs="index.columns" expand-on="index.header_column" on-select="index.open_folder(branch)" on-click="index.open_folder(branch)" icon-expand="glyphicon glyphicon-folder-close" icon-collapse="glyphicon glyphicon-folder-open"></tree-grid>
+                <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <th class="col-md-9"><a href="" ng-click="index.toggle_sort('name', false)">Name
+                            <i ng-show="index.sort.name == 'name'" class="glyphicon pull-right" ng-class="index.sort.rev ? 'glyphicon-arrow-up': 'glyphicon-arrow-down'"></i></a>
+                        </th>
+                        <th class="col-md-2"><a href="" ng-click="index.toggle_sort('mtime', true)">Time
+                            <i ng-show="index.sort.name == 'mtime'" class="glyphicon pull-right" ng-class="index.sort.rev ? 'glyphicon-arrow-up': 'glyphicon-arrow-down'"></i></a>
+                        </th>
+                        <th class="col-md-1"><a href="" ng-click="index.toggle_sort('size', false)">Size
+                            <i ng-show="index.sort.name == 'size'" class="glyphicon pull-right" ng-class="index.sort.rev ? 'glyphicon-arrow-up': 'glyphicon-arrow-down'"></i></a>
+                        </th>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="row in index.files | orderBy:index.sort.name:index.sort.rev">
+                            <td ng-click="index.open_folder(row) && $event.preventDefault()"><a href="{{ index.path }}/{{ row.name }}"><i class="glyphicon" ng-class="{'glyphicon-folder-close': row.type == 'directory', 'glyphicon-file': row.type == 'file'}"></i> {{ row.name }}</a></td>
+                            <td>{{ row.mtime | date:'short' }}</td>
+                            <td><span ng-bind="row.size | humanize" ng-show="row.size"></span></td>
+                        </tr>
+                    </tbody>
+                </table>
+                </div>
             </div>
 
             <div class="row" ng-show="index.error">
@@ -34,14 +50,25 @@
             </div>
         </div>
         <script>
-var index = angular.module('index', ['ng', 'treeGrid']);
-index.controller('IndexController', ['$http', '$location', '$scope', function ($http, $location, $scope) {
+var index = angular.module('index', ['ng']);
+index.controller('IndexController', ['$http', '$location', '$rootScope', function ($http, $location, $scope) {
     var self = this;
 
     $scope.$on('$locationChangeSuccess', function () {
         self.path_parts = path_parts(self.path = $location.path());
         load_folder(self.path);
     });
+
+    this.sort = { 'rev': false };
+
+    this.toggle_sort = function (col, rev) {
+        if (self.sort.name == col) {
+            self.sort.rev = !self.sort.rev;
+        } else {
+            self.sort.name = col;
+            self.sort.rev = rev;
+        }
+    };
 
     this.path_parts = path_parts(this.path = $location.path());
 
@@ -52,19 +79,12 @@ index.controller('IndexController', ['$http', '$location', '$scope', function ($
             } else {
                 $location.path(self.path + '/' + branch.name);
             }
+            return true;
         }
+
+        return false;
     };
-    this.header_column = {
-        field: 'name',
-        displayName: 'Name',
-        filterable: true,
-        sortable: true
-    };
-    this.columns = [
-        { field: 'name', displayName: 'Link', cellTemplate: '<a ng-href="{{ cellTemplateScope.index.path }}/{{ row.branch[col.field] }}" ng-if="row.branch.type != \'directory\'">direct link →</a>', cellTemplateScope: {index: this} },
-        { field: 'mtime', displayName: 'Time', sortable: true, cellTemplate: '<span ng-bind=\'row.branch[col.field] | date:"short"\'</span>', sortingType: 'date' },
-        { field: 'size', displayName: 'Size', sortable: true, sortingType: 'number', cellTemplate: '<span ng-if="row.branch.size" title="{{ row.branch[col.field] }}" ng-bind="row.branch[col.field] | humanize"></span>' }
-    ];
+
     this.files = [];
 
     this.go_up = function () {
@@ -83,21 +103,19 @@ index.controller('IndexController', ['$http', '$location', '$scope', function ($
             method: 'GET',
             url: 'http/' + path
         }).then(function (response) {
-            var files = response.data || [], file;
+            var files = response.data || [];
+
             for (var i = 0, l = files.length; i < l; i++) {
-                file = files[i];
-                file.mtime = new Date(file.mtime);
-                if (file.type == 'directory') {
-                    file.children = [{name: 'loading...'}];
-                }
+                files[i].mtime = new Date(files[i].mtime);
             }
 
+            self.filterString = '';
             self.files = files;
-            $scope.filterString = '';
         }, function (response) {
             self.error = response;
         });
     }
+
     function path_parts(path) {
         var parts = (path == '/'? '': path).split('/'), up = '', path;
         for (var i = 0, l = parts.length; i < l; i++) {
