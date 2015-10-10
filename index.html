@@ -9,7 +9,7 @@
         <div class="container-fluid ng-cloak">
             <div class="row">
                 <ol class="breadcrumb" style="left: 20px; right: 20px; position: fixed; z-index: 1000;">
-                    <li ng-class="{'active': $last}" ng-repeat="part in index.path_parts"><span ng-if="$last">{{ part.name }} <small>({{index.files.length}})</small></span><a ng-if="!$last" href="#{{ part.path }}" ng-bind="part.name"></a></li>
+                    <li ng-class="{'active': $last}" ng-repeat="part in index.path_parts"><span ng-if="$last">{{ part.name }} <small ng-if="index.files.length > 5">({{index.files.length}})</small></span><a ng-if="!$last" href="#{{ part.path }}" ng-bind="part.name"></a></li>
                     <li class="pull-right" ng-show="index.scrolled"><a href="" ng-click="index.scroll_top()"><i class="glyphicon glyphicon-arrow-up"></i></a></li>
                 </ol>
             </div>
