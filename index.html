@@ -8,7 +8,6 @@
     <body ng-controller="IndexController as index" style="margin: 10px 20px">
         <div class="container-fluid ng-cloak">
             <div class="row">
-                <form class="hide col-md-2 pull-right"><div class="input-group"><span class="input-group-addon"><i class="glyphicon glyphicon-filter"></i></span><input class="form-control" type="search" ng-model="index.filterString" placeholder="Filter…" /></div></form>
                 <ol class="breadcrumb">
                     <li ng-class="{'active': $last}" ng-repeat="part in index.path_parts"><span ng-if="$last" ng-bind="part.name"></span><a ng-if="!$last" href="#{{ part.path }}" ng-bind="part.name"></a></li>
                 </ol>
@@ -115,7 +114,6 @@ index.controller('IndexController', ['$http', '$location', '$rootScope', functio
                 files[i].mtime = new Date(files[i].mtime);
             }
 
-            self.filterString = '';
             self.files = files;
             window.localStorage.setItem('lastPath', path);
         }, function (response) {
