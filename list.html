@@ -13,6 +13,7 @@
     <body ng-controller="IndexController as index" style="margin: 10px 20px">
         <div class="container-fluid">
             <div class="row">
+                <form class="col-md-2 pull-right"><div class="input-group"><span class="input-group-addon"><i class="glyphicon glyphicon-filter"></i></span><input class="form-control" type="search" ng-model="filterString" placeholder="Filter…" /></div></form>
                 <ol class="breadcrumb">
                     <li><a ng-hide="index.path == '' || index.path == '/'" href="" ng-click="index.go_up()"><i class="glyphicon glyphicon-arrow-up"></i></a></li>
                     <li ng-class="{'active': $last}" ng-repeat="part in index.path_parts"><span ng-if="$last">{{ part.name }}</span><a ng-if="!$last" href="#{{ part.path }}">{{ part.name }}</a></li>
@@ -53,7 +54,7 @@ index.controller('IndexController', ['$http', '$location', '$rootScope', functio
     this.columns = [
         { field: 'name', displayName: 'Link', cellTemplate: '<a ng-href="{{ cellTemplateScope.index.path }}/{{ row.branch[col.field] }}" ng-if="row.branch.type != \'directory\'">direct link →</a>', cellTemplateScope: {index: this} },
         { field: 'mtime', displayName: 'Time', sortable: true, cellTemplate: '<span ng-bind=\'row.branch[col.field] | date:"short"\'</span>', sortingType: 'date' },
-        { field: 'size', displayName: 'Size', sortable: true, sortingType: 'number', cellTemplate: '<span title="{{ row.branch[col.field] }}" ng-bind="row.branch[col.field] | humanize"></span>' }
+        { field: 'size', displayName: 'Size', sortable: true, sortingType: 'number', cellTemplate: '<span ng-if="row.branch.size" title="{{ row.branch[col.field] }}" ng-bind="row.branch[col.field] | humanize"></span>' }
     ];
     this.files = [];
 
