@@ -114,8 +114,18 @@ function ($http, $location, $scope, window, $timeout, FILES_BASE_URL) {
 
     this.loading = false;
 
+    var scrollTicker;
     this.scroll_top = function () {
-        window.scrollTo(0, 0);
+        scrollTicker && clearInterval(scrollTicker);
+        scrollTicker = setInterval(function () {
+            var y = 0.6 * window.scrollY;
+            if (y < 100) {
+                y = 0;
+                clearInterval(scrollTicker);
+            }
+
+            window.scrollTo(0, y);
+        }, 10);
     };
 
     window.addEventListener('scroll', function () {
