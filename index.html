@@ -7,6 +7,13 @@
         <style>
             .ng-cloak { display: none !important; }
             table.table tr a { display: block; }
+            @keyframes rotate {
+                from { transform: rotate(0deg); }
+                to { transform: rotate(360deg); }
+            }
+            .loader {
+                animation: rotate 1s infinite linear;
+            }
         </style>
     </head>
     <body ng-controller="IndexController as index" style="margin: 10px 20px">
@@ -14,7 +21,7 @@
             <div class="row">
                 <ol class="breadcrumb" style="left: 20px; right: 20px; position: fixed; z-index: 1000;">
                     <li ng-class="{'active': $last}" ng-repeat="part in index.path_parts"><span ng-if="$last">{{ part.name }} <small ng-if="index.files.length > 5">({{index.files.length}})</small></span><a ng-if="!$last" href="#{{ part.path }}" ng-bind="part.name"></a></li>
-                    <li class="pull-right" ng-show="index.scrolled"><a href="" ng-click="index.scroll_top()"><i class="glyphicon glyphicon-arrow-up"></i></a></li>
+                    <li class="pull-right" ng-show="index.scrolled"><a href="" ng-click="index.scroll_top()"><i class="glyphicon glyphicon-arrow-up"></i></a><i class="loader glyphicon glyphicon-refresh" ng-show="index.loading"></i></li>
                 </ol>
             </div>
 
@@ -101,6 +108,8 @@ index.controller('IndexController', ['$http', '$location', '$rootScope', '$windo
 
     this.files = [];
 
+    this.loading = false;
+
     this.scroll_top = function () {
         window.scrollTo(0, 0);
     };
@@ -148,6 +157,7 @@ index.controller('IndexController', ['$http', '$location', '$rootScope', '$windo
     function load_folder(path) {
         self.error = null;
         self.chosen = -1;
+        self.loading = true;
 
         $http({
             method: 'GET',
@@ -160,8 +170,10 @@ index.controller('IndexController', ['$http', '$location', '$rootScope', '$windo
             }
 
             self.files = files;
+            self.loading = false;
             window.localStorage.setItem('lastPath', path);
         }, function (response) {
+            self.loading = false;
             self.error = response;
         });
     }
