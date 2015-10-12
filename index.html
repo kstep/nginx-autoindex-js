@@ -117,6 +117,13 @@ function ($http, $location, $scope, window, $timeout, FILES_BASE_URL) {
     var scrollTicker;
     this.scroll_top = function () {
         scrollTicker && clearInterval(scrollTicker);
+
+        // Too large files list, we are quite slow already
+        if (self.files.length > 500) {
+            window.scrollTo(0, 0);
+            return;
+        }
+
         scrollTicker = setInterval(function () {
             var y = 0.6 * window.scrollY;
             if (y < 100) {
