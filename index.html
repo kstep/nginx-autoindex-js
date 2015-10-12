@@ -66,7 +66,8 @@
         </div>
         <script>
 var index = angular.module('index', ['ng']);
-index.controller('IndexController', ['$http', '$location', '$rootScope', '$window', function ($http, $location, $scope, window) {
+index.constant("FILES_BASE_URL", "http://localhost:8080/");
+index.controller('IndexController', ['$http', '$location', '$rootScope', '$window', "FILES_BASE_URL", function ($http, $location, $scope, window, FILES_BASE_URL) {
     var self = this;
 
     $scope.$on('$locationChangeSuccess', function () {
@@ -161,7 +162,7 @@ index.controller('IndexController', ['$http', '$location', '$rootScope', '$windo
 
         $http({
             method: 'GET',
-            url: 'http/' + (path || '')
+            url: FILES_BASE_URL + (path || '')
         }).then(function (response) {
             var files = response.data || [];
 
