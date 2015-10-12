@@ -21,7 +21,7 @@
         <div class="container-fluid ng-cloak">
             <div class="row">
                 <ol class="breadcrumb" style="left: 20px; right: 20px; position: fixed; z-index: 1000;">
-                    <li ng-class="{'active': $last}" ng-repeat="part in index.path_parts"><span ng-if="$last">{{ part.name }} <small ng-if="index.files.length > 5">({{index.files.length}})</small></span><a ng-if="!$last" href="#{{ part.path }}" ng-bind="part.name"></a></li>
+                    <li ng-class="::{'active': $last}" ng-repeat="part in index.path_parts"><span ng-if="$last">{{:: part.name }} <small ng-if="index.files.length > 5">({{index.files.length}})</small></span><a ng-if="!$last" href="#{{:: part.path }}" ng-bind="::part.name"></a></li>
                     <li class="active" ng-show="index.loading.running"><i class="loader glyphicon glyphicon-refresh"></i></li>
                     <li class="pull-right" ng-show="index.scrolled"><a href="" ng-click="index.scroll_top()"><i class="glyphicon glyphicon-arrow-up"></i></a></li>
                 </ol>
@@ -41,16 +41,16 @@
                             <i ng-show="index.sort.name == 'size'" class="glyphicon pull-right" ng-class="index.sort.rev ? 'glyphicon-arrow-up': 'glyphicon-arrow-down'"></i></a>
                         </th>
                     </thead>
-                    <tbody>
+                    <tbody ng-click="index.open_folder($event)">
                         <tr ng-hide="index.path == '' || index.path == '/'">
                             <td ng-click="index.go_up()"><a href=""><i class="glyphicon glyphicon-level-up"></i> ..</a></td>
                             <td></td>
                             <td></td>
                         </tr>
-                        <tr ng-repeat="row in index.files | orderBy:index.sort.name:index.sort.rev" ng-class="{'active': index.chosen == $index}">
-                            <td><a ng-click="index.open_folder(row) && $event.preventDefault()" href="{{ index.path }}/{{ row.name }}"><i class="glyphicon" ng-class="{'glyphicon-folder-close': row.type == 'directory', 'glyphicon-file': row.type == 'file'}"></i> {{ row.name }}</a></td>
-                            <td>{{ row.mtime | date:'short' }}</td>
-                            <td><span ng-bind="row.size | humanize" ng-show="row.size"></span></td>
+                        <tr ng-repeat="row in index.files | orderBy:index.sort.name:index.sort.rev">
+                            <td><a href="{{:: index.path }}/{{:: row.name }}"><i class="glyphicon" ng-class="::{ 'glyphicon-folder-close': row.type == 'directory', 'glyphicon-file': row.type == 'file' }"></i> {{:: row.name }}</a></td>
+                            <td>{{:: row.mtime | date:'short' }}</td>
+                            <td><span ng-bind=":: row.size | humanize" ng-if=":: row.size"></span></td>
                         </tr>
                     </tbody>
                 </table>
@@ -93,21 +93,24 @@ function ($http, $location, $scope, window, $timeout, FILES_BASE_URL) {
         $location.path(this.path);
     }
 
-    this.open_folder = function (branch) {
-        if (!branch) {
-            return false;
+    this.open_folder = function (ev) {
+        var elem = ev.srcElement;
+        if (elem.tagName != 'A') {
+            return;
         }
 
-        if (branch.type == 'directory') {
-            if (self.path == '/') {
-                $location.path('/' + branch.name);
-            } else {
-                $location.path(self.path + '/' + branch.name);
-            }
-            return true;
+        var branch = self.files[angular.element(elem).scope().$index];
+
+        if (!branch || branch.type != 'directory') {
+            return;
         }
 
-        return false;
+        ev.preventDefault();
+        if (self.path == '/') {
+            $location.path('/' + branch.name);
+        } else {
+            $location.path(self.path + '/' + branch.name);
+        }
     };
 
     this.files = [];
