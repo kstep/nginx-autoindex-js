@@ -124,32 +124,6 @@ function ($http, $location, $scope, window, $timeout, FILES_BASE_URL) {
 
     this.loading = false;
 
-    window.addEventListener('keyup', function (ev) {
-        switch (ev.keyCode) {
-            case 39: // Right
-            case 13: // Enter
-                self.open_folder(self.files[self.chosen]);
-                $scope.$digest();
-                break;
-            case 40: // Down
-                self.chosen = (self.chosen + 1) % self.files.length;
-                $scope.$digest();
-                break;
-            case 38: // Up
-                self.chosen = self.chosen - 1;
-                if (self.chosen < 0) {
-                    self.chosen = self.files.length + self.chosen;
-                }
-                $scope.$digest();
-                break;
-            case 37: // Left
-                self.go_up();
-                $scope.$digest();
-                break;
-            default:
-        }
-    });
-
     this.go_up = function () {
         var lastSlash = self.path.lastIndexOf('/');
         if (lastSlash < 0) {
@@ -178,7 +152,6 @@ function ($http, $location, $scope, window, $timeout, FILES_BASE_URL) {
 
     function load_folder(path) {
         self.error = null;
-        self.chosen = -1;
         self.loading.start();
 
         $http({
