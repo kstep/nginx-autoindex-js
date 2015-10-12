@@ -106,7 +106,7 @@ function ($http, $location, $scope, window, $timeout, FILES_BASE_URL) {
             return;
         }
 
-        var branch = self.files[angular.element(elem).scope().$index];
+        var branch = angular.element(elem).scope().row;
 
         if (!branch || branch.type != 'directory') {
             return;
