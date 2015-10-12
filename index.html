@@ -15,15 +15,22 @@
             .loader {
                 animation: rotate 1s infinite linear;
             }
+
+            #scroll-to-top {
+                position: fixed;
+                z-index: 2000;
+                right: 30px;
+                top: 1.25em;
+            }
         </style>
     </head>
     <body ng-controller="IndexController as index" style="margin: 10px 20px">
+        <div ng-controller="ScrollToTopController as scroll" class="pull-right" id="scroll-to-top" ng-show="scroll.show"><a href="" ng-click="scroll.to_top()"><i class="glyphicon glyphicon-arrow-up"></i> to top</a></div>
         <div class="container-fluid ng-cloak">
             <div class="row">
                 <ol class="breadcrumb" style="left: 20px; right: 20px; position: fixed; z-index: 1000;">
                     <li ng-class="::{'active': $last}" ng-repeat="part in index.path_parts"><span ng-if="$last">{{:: part.name }} <small ng-if="index.files.length > 5">({{index.files.length}})</small></span><a ng-if="!$last" href="#{{:: part.path }}" ng-bind="::part.name"></a></li>
                     <li class="active" ng-show="index.loading.running"><i class="loader glyphicon glyphicon-refresh"></i></li>
-                    <li class="pull-right" ng-show="index.scrolled"><a href="" ng-click="index.scroll_top()"><i class="glyphicon glyphicon-arrow-up"></i></a></li>
                 </ol>
             </div>
 
@@ -117,36 +124,6 @@ function ($http, $location, $scope, window, $timeout, FILES_BASE_URL) {
 
     this.loading = false;
 
-    var scrollTicker;
-    this.scroll_top = function () {
-        scrollTicker && clearInterval(scrollTicker);
-
-        // Too large files list, we are quite slow already
-        if (self.files.length > 500) {
-            window.scrollTo(0, 0);
-            return;
-        }
-
-        scrollTicker = setInterval(function () {
-            var y = 0.6 * window.scrollY;
-            if (y < 100) {
-                y = 0;
-                clearInterval(scrollTicker);
-            }
-
-            window.scrollTo(0, y);
-        }, 10);
-    };
-
-    var scrollDebounce = null;
-    window.addEventListener('scroll', function () {
-        scrollDebounce && clearTimeout(scrollDebounce);
-        self.scrolled = window.scrollY > 150;
-        scrollDebounce = setTimeout(function () {
-            $scope.$digest();
-        }, 1000);
-    });
-
     window.addEventListener('keyup', function (ev) {
         switch (ev.keyCode) {
             case 39: // Right
@@ -233,6 +210,40 @@ function ($http, $location, $scope, window, $timeout, FILES_BASE_URL) {
             parts[i] = { path: path, name: parts[i] || '‹root›' };
         }
         return parts;
+    };
+}])
+.controller('ScrollToTopController', ['$window', '$scope', function (window, $scope) {
+    var self = this;
+    this.show = false;
+
+    var scrollDebounce = null;
+    window.addEventListener('scroll', function () {
+        scrollDebounce && clearTimeout(scrollDebounce);
+        self.show = window.scrollY > 150;
+        scrollDebounce = setTimeout(function () {
+            $scope.$digest();
+        }, 500);
+    });
+
+    var scrollTicker;
+    this.to_top = function () {
+        scrollTicker && clearInterval(scrollTicker);
+
+        // Too large files list, we are quite slow already
+        if ($scope.$parent.index.files.length > 500) {
+            window.scrollTo(0, 0);
+            return;
+        }
+
+        scrollTicker = setInterval(function () {
+            var y = 0.6 * window.scrollY;
+            if (y < 100) {
+                y = 0;
+                clearInterval(scrollTicker);
+            }
+
+            window.scrollTo(0, y);
+        }, 10);
     };
 }])
 .filter('humanize', function () {
