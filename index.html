@@ -138,9 +138,13 @@ function ($http, $location, $scope, window, $timeout, FILES_BASE_URL) {
         }, 10);
     };
 
+    var scrollDebounce = null;
     window.addEventListener('scroll', function () {
+        scrollDebounce && clearTimeout(scrollDebounce);
         self.scrolled = window.scrollY > 150;
-        $scope.$digest();
+        scrollDebounce = setTimeout(function () {
+            $scope.$digest();
+        }, 1000);
     });
 
     window.addEventListener('keyup', function (ev) {
