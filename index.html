@@ -1,5 +1,5 @@
 <!DOCTYPE HTML>
-<html>
+<html ng-app="index">
     <head>
         <script src="/tree-grid/lib/angular.min.js"></script>
         <link type="text/css" rel="stylesheet" href="/tree-grid/lib/bootstrap.min.css" />
@@ -65,9 +65,10 @@
             </div>
         </div>
         <script>
-var index = angular.module('index', ['ng']);
-index.constant("FILES_BASE_URL", "http://localhost:8080/");
-index.controller('IndexController', ['$http', '$location', '$rootScope', '$window', "FILES_BASE_URL", function ($http, $location, $scope, window, FILES_BASE_URL) {
+angular.module('index', ['ng'])
+.constant("FILES_BASE_URL", "http/")
+.controller('IndexController', ['$http', '$location', '$rootScope', '$window', 'FILES_BASE_URL',
+function ($http, $location, $scope, window, FILES_BASE_URL) {
     var self = this;
 
     $scope.$on('$locationChangeSuccess', function () {
@@ -188,8 +189,8 @@ index.controller('IndexController', ['$http', '$location', '$rootScope', '$windo
         }
         return parts;
     };
-}]);
-index.filter('humanize', function () {
+}])
+.filter('humanize', function () {
     return function humanize(number) {
         if(number < 1024) {
             return number + ' bytes';
@@ -200,9 +201,6 @@ index.filter('humanize', function () {
         result = (result % 1 > (1 / Math.pow(1024, exp - 1))) ? result.toFixed(2) : result.toFixed(0);
         return result + ' ' + si[exp - 1] + 'ib';
     };
-});
-angular.element(document).ready(function () {
-    angular.bootstrap(document, ['index']);
 });
         </script>
     </body>
