@@ -21,7 +21,8 @@
             <div class="row">
                 <ol class="breadcrumb" style="left: 20px; right: 20px; position: fixed; z-index: 1000;">
                     <li ng-class="{'active': $last}" ng-repeat="part in index.path_parts"><span ng-if="$last">{{ part.name }} <small ng-if="index.files.length > 5">({{index.files.length}})</small></span><a ng-if="!$last" href="#{{ part.path }}" ng-bind="part.name"></a></li>
-                    <li class="pull-right" ng-show="index.scrolled"><a href="" ng-click="index.scroll_top()"><i class="glyphicon glyphicon-arrow-up"></i></a><i class="loader glyphicon glyphicon-refresh" ng-show="index.loading"></i></li>
+                    <li class="active" ng-show="index.loading.running"><i class="loader glyphicon glyphicon-refresh"></i></li>
+                    <li class="pull-right" ng-show="index.scrolled"><a href="" ng-click="index.scroll_top()"><i class="glyphicon glyphicon-arrow-up"></i></a></li>
                 </ol>
             </div>
 
@@ -67,8 +68,8 @@
         <script>
 angular.module('index', ['ng'])
 .constant("FILES_BASE_URL", "http/")
-.controller('IndexController', ['$http', '$location', '$rootScope', '$window', 'FILES_BASE_URL',
-function ($http, $location, $scope, window, FILES_BASE_URL) {
+.controller('IndexController', ['$http', '$location', '$rootScope', '$window', '$timeout', 'FILES_BASE_URL',
+function ($http, $location, $scope, window, $timeout, FILES_BASE_URL) {
     var self = this;
 
     $scope.$on('$locationChangeSuccess', function () {
@@ -156,10 +157,27 @@ function ($http, $location, $scope, window, FILES_BASE_URL) {
         }
     };
 
+    this.loading = {
+        running: false,
+        timer: null,
+        start: function (timeout) {
+            var self = this;
+            this.stop();
+            this.timer = $timeout(function () {
+                self.running = true;
+            }, timeout || 500);
+        },
+        stop: function () {
+            this.timer && $timeout.cancel(this.timer);
+            this.timer = null;
+            this.running = false;
+        }
+    };
+
     function load_folder(path) {
         self.error = null;
         self.chosen = -1;
-        self.loading = true;
+        self.loading.start();
 
         $http({
             method: 'GET',
@@ -172,11 +190,11 @@ function ($http, $location, $scope, window, FILES_BASE_URL) {
             }
 
             self.files = files;
-            self.loading = false;
+            self.loading.stop();
             window.localStorage.setItem('lastPath', path);
         }, function (response) {
-            self.loading = false;
             self.error = response;
+            self.loading.stop();
         });
     }
 
