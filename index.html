@@ -192,9 +192,11 @@ function ($http, $location, $scope, window, $timeout, FILES_BASE_URL) {
             self.files = files;
             self.loading.stop();
             window.localStorage.setItem('lastPath', path);
+            window.scrollTo(0, 0);
         }, function (response) {
             self.error = response;
             self.loading.stop();
+            window.scrollTo(0, 0);
         });
     }
 
