@@ -75,17 +75,30 @@
         </div>
         <script>
 angular.module('index', ['ng'])
-.constant("FILES_BASE_URL", "")
-.controller('IndexController', ['$http', '$location', '$rootScope', '$window', '$timeout', 'FILES_BASE_URL',
+.controller('IndexController', ['$http', '$location', '$rootScope', '$window', '$timeout',
 function ($http, $location, $scope, window, $timeout, FILES_BASE_URL) {
     var self = this;
 
-    $scope.$on('$locationChangeSuccess', function () {
-        self.path_parts = path_parts(self.path = $location.path());
-        load_folder(self.path);
-    });
-
+    this.config = null;
     this.sort = { 'rev': false };
+    this.files = [];
+
+    this.loading = {
+        running: false,
+        timer: null,
+        start: function (timeout) {
+            var self = this;
+            this.stop();
+            this.timer = $timeout(function () {
+                self.running = true;
+            }, timeout || 500);
+        },
+        stop: function () {
+            this.timer && $timeout.cancel(this.timer);
+            this.timer = null;
+            this.running = false;
+        }
+    };
 
     this.toggle_sort = function (col, rev) {
         if (self.sort.name == col) {
@@ -95,10 +108,6 @@ function ($http, $location, $scope, window, $timeout, FILES_BASE_URL) {
             self.sort.rev = rev;
         }
     };
-
-    if ($location.path() == '' && (this.path = window.localStorage.getItem('lastPath'))) {
-        $location.path(this.path);
-    }
 
     this.open_folder = function (ev) {
         var elem = ev.srcElement;
@@ -120,10 +129,6 @@ function ($http, $location, $scope, window, $timeout, FILES_BASE_URL) {
         }
     };
 
-    this.files = [];
-
-    this.loading = false;
-
     this.go_up = function () {
         var lastSlash = self.path.lastIndexOf('/');
         if (lastSlash < 0) {
@@ -133,30 +138,13 @@ function ($http, $location, $scope, window, $timeout, FILES_BASE_URL) {
         }
     };
 
-    this.loading = {
-        running: false,
-        timer: null,
-        start: function (timeout) {
-            var self = this;
-            this.stop();
-            this.timer = $timeout(function () {
-                self.running = true;
-            }, timeout || 500);
-        },
-        stop: function () {
-            this.timer && $timeout.cancel(this.timer);
-            this.timer = null;
-            this.running = false;
-        }
-    };
-
     function load_folder(path) {
         self.error = null;
         self.loading.start();
 
         $http({
             method: 'GET',
-            url: FILES_BASE_URL + (path || '')
+            url: self.config.base_index_url + (path || '')
         }).then(function (response) {
             var files = response.data || [];
 
@@ -183,7 +171,38 @@ function ($http, $location, $scope, window, $timeout, FILES_BASE_URL) {
             parts[i] = { path: path, name: parts[i] || '‹root›' };
         }
         return parts;
-    };
+    }
+
+    function initialize(config) {
+        self.loading.start();
+        $http({
+            url: config || 'config.json',
+            method: 'GET'
+        }).then(function (response) {
+            self.loading.stop();
+
+            self.config = response.data || {
+                base_index_url: ""
+            };
+
+            $scope.$on('$locationChangeSuccess', function () {
+                self.path_parts = path_parts(self.path = $location.path());
+                load_folder(self.path);
+            });
+
+            if ($location.path() == '' && (this.path = window.localStorage.getItem('lastPath'))) {
+                $location.path(this.path);
+            } else {
+                $scope.$broadcast('$locationChangeSuccess');
+            }
+
+        }, function (response) {
+            self.loading.stop();
+            self.error = response;
+        });
+    }
+
+    initialize();
 }])
 .controller('ScrollToTopController', ['$window', '$scope', function (window, $scope) {
     var self = this;
