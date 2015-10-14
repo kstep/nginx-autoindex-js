@@ -202,7 +202,7 @@ function ($http, $location, $scope, window, $timeout, FILES_BASE_URL) {
         });
     }
 
-    initialize();
+    initialize($location.search().config);
 }])
 .controller('ScrollToTopController', ['$window', '$scope', function (window, $scope) {
     var self = this;
