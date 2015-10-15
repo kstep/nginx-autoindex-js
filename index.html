@@ -48,14 +48,14 @@
                             <i ng-show="index.sort.name == 'size'" class="glyphicon pull-right" ng-class="index.sort.rev ? 'glyphicon-arrow-up': 'glyphicon-arrow-down'"></i></a>
                         </th>
                     </thead>
-                    <tbody ng-click="index.open_folder($event)">
+                    <tbody>
                         <tr ng-hide="index.path == '' || index.path == '/'">
                             <td ng-click="index.go_up()"><a href=""><i class="glyphicon glyphicon-level-up"></i> ..</a></td>
                             <td></td>
                             <td></td>
                         </tr>
                         <tr ng-repeat="row in index.files | orderBy:index.sort.name:index.sort.rev">
-                            <td><a href="{{:: index.path }}/{{:: row.name }}"><i class="glyphicon" ng-class="::{ 'glyphicon-folder-close': row.type == 'directory', 'glyphicon-file': row.type == 'file', 'glyphicon-question-sign': row.type == 'other' }"></i> {{:: row.name }}</a></td>
+                            <td><a href="{{:: row.type == 'directory' ? '#' : '' }}{{:: index.path }}/{{:: row.name }}"><i class="glyphicon" ng-class="::{ 'glyphicon-folder-close': row.type == 'directory', 'glyphicon-file': row.type == 'file', 'glyphicon-question-sign': row.type == 'other' }"></i> {{:: row.name }}</a></td>
                             <td>{{:: row.mtime | date:'short' }}</td>
                             <td><span title="{{:: row.size }}" ng-bind=":: row.size | humanize" ng-if=":: row.size != undefined"></span></td>
                         </tr>
@@ -108,26 +108,6 @@ function ($http, $location, $scope, window, $timeout, FILES_BASE_URL) {
             this.timer && $timeout.cancel(this.timer);
             this.timer = null;
             this.running = false;
-        }
-    };
-
-    this.open_folder = function (ev) {
-        var elem = ev.srcElement;
-        if (elem.tagName != 'A') {
-            return;
-        }
-
-        var branch = angular.element(elem).scope().row;
-
-        if (!branch || branch.type != 'directory') {
-            return;
-        }
-
-        ev.preventDefault();
-        if (self.path == '/') {
-            $location.path('/' + branch.name);
-        } else {
-            $location.path(self.path + '/' + branch.name);
         }
     };
 
