@@ -38,13 +38,13 @@
                 <div class="table-responsive">
                 <table class="table">
                     <thead>
-                        <th class="col-md-9"><a ng-click="index.toggle_sort('name', false)" href="">Name
+                        <th class="col-md-9" ng-class="{'info': index.sort.name == 'name'}"><a ng-click="index.sort.toggle('name', false)" href="">Name
                             <i ng-show="index.sort.name == 'name'" class="glyphicon pull-right" ng-class="index.sort.rev ? 'glyphicon-arrow-up': 'glyphicon-arrow-down'"></i></a>
                         </th>
-                        <th class="col-md-2"><a ng-click="index.toggle_sort('mtime', true)" href="">Time
+                        <th class="col-md-2" ng-class="{'info': index.sort.name == 'mtime'}"><a ng-click="index.sort.toggle('mtime', true)" href="">Time
                             <i ng-show="index.sort.name == 'mtime'" class="glyphicon pull-right" ng-class="index.sort.rev ? 'glyphicon-arrow-up': 'glyphicon-arrow-down'"></i></a>
                         </th>
-                        <th class="col-md-1"><a ng-click="index.toggle_sort('size', false)" href="">Size
+                        <th class="col-md-1" ng-class="{'info': index.sort.name == 'size'}"><a ng-click="index.sort.toggle('size', false)" href="">Size
                             <i ng-show="index.sort.name == 'size'" class="glyphicon pull-right" ng-class="index.sort.rev ? 'glyphicon-arrow-up': 'glyphicon-arrow-down'"></i></a>
                         </th>
                     </thead>
@@ -80,7 +80,18 @@ function ($http, $location, $scope, window, $timeout, FILES_BASE_URL) {
     var self = this;
 
     this.config = null;
-    this.sort = { 'rev': false };
+    this.sort = {
+        rev: false,
+        toggle: function (col, rev) {
+            if (this.name == col) {
+                this.rev = !this.rev;
+            } else {
+                this.name = col;
+                this.rev = rev;
+            }
+        }
+    };
+
     this.files = [];
 
     this.loading = {
@@ -97,15 +108,6 @@ function ($http, $location, $scope, window, $timeout, FILES_BASE_URL) {
             this.timer && $timeout.cancel(this.timer);
             this.timer = null;
             this.running = false;
-        }
-    };
-
-    this.toggle_sort = function (col, rev) {
-        if (self.sort.name == col) {
-            self.sort.rev = !self.sort.rev;
-        } else {
-            self.sort.name = col;
-            self.sort.rev = rev;
         }
     };
 
