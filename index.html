@@ -29,8 +29,8 @@
         <div ng-controller="IndexController as index" class="container-fluid ng-cloak">
             <div class="row">
                 <ol class="breadcrumb" style="left: 20px; right: 20px; position: fixed; z-index: 1000;">
+                    <li><a href="" ng-click="index.reload()" title="Reload"><i ng-class="{'loader': index.reloading.running || index.loading.running}" class="glyphicon glyphicon-refresh"></i></a></li>
                     <li ng-class="::{'active': $last}" ng-repeat="part in index.path_parts"><span ng-if="::$last">{{:: part.name }} <small ng-if="index.files.length > 5">({{index.files.length}})</small></span><a ng-if="::!$last" href="#{{:: part.path }}" ng-bind="::part.name"></a></li>
-                    <li class="active" ng-show="index.loading.running"><i class="loader glyphicon glyphicon-refresh"></i></li>
                 </ol>
             </div>
 
@@ -98,11 +98,18 @@ function ($http, $location, $scope, window, $timeout, FILES_BASE_URL) {
         running: false,
         timer: null,
         start: function (timeout) {
+            if (timeout == undefined) { timeout = 500; }
+
             var self = this;
             this.stop();
-            this.timer = $timeout(function () {
-                self.running = true;
-            }, timeout || 500);
+
+            if (timeout > 0) {
+                this.timer = $timeout(function () {
+                    self.running = true;
+                }, timeout);
+            } else {
+                this.running = true;
+            }
         },
         stop: function () {
             this.timer && $timeout.cancel(this.timer);
@@ -120,11 +127,29 @@ function ($http, $location, $scope, window, $timeout, FILES_BASE_URL) {
         }
     };
 
+    this.reloading = {
+        running: false,
+        start: function (timeout) {
+            this.timer && $timeout.cancel(this.timer);
+            this.running = true;
+
+            var self = this;
+            this.timer = $timeout(function () {
+                self.running = false;
+            }, timeout || 1000);
+        }
+    };
+
+    this.reload = function () {
+        self.reloading.start();
+        load_folder(self.path);
+    };
+
     function load_folder(path) {
         self.error = null;
         self.loading.start();
 
-        $http({
+        return $http({
             method: 'GET',
             url: self.config.base_index_url + (path || '')
         }).then(function (response) {
@@ -136,6 +161,7 @@ function ($http, $location, $scope, window, $timeout, FILES_BASE_URL) {
 
             self.files = files;
             self.loading.stop();
+
             window.localStorage.setItem('lastPath', path);
             window.scrollTo(0, 0);
         }, function (response) {
