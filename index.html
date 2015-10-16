@@ -75,7 +75,7 @@
         </div>
         <script>
 angular.module('index', ['ng'])
-.controller('IndexController', ['$http', '$location', '$rootScope', '$window', '$timeout',
+.controller('IndexController', ['$http', '$location', '$scope', '$window', '$timeout',
 function ($http, $location, $scope, window, $timeout, FILES_BASE_URL) {
     var self = this;
 
@@ -169,11 +169,13 @@ function ($http, $location, $scope, window, $timeout, FILES_BASE_URL) {
 
             $scope.$on('$locationChangeSuccess', function () {
                 self.path_parts = path_parts(self.path = $location.path());
+                if (self.path == '/') self.path = '';
                 load_folder(self.path);
             });
 
-            if ($location.path() == '' && (this.path = window.localStorage.getItem('lastPath'))) {
-                $location.path(this.path);
+            var path;
+            if ($location.path() == '' && (path = window.localStorage.getItem('lastPath'))) {
+                $location.path(path);
             } else {
                 $scope.$broadcast('$locationChangeSuccess');
             }
