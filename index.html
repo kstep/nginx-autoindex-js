@@ -38,14 +38,14 @@
                 <div class="table-responsive">
                 <table class="table">
                     <thead>
-                        <th class="col-md-9" ng-class="{'info': index.sort.name == 'name'}"><a title="Reset sort" class="pull-left" href="" ng-style="{'visibility': index.sort.name ? 'visible' : 'hidden'}" ng-click="index.sort.reset()"><i class="glyphicon glyphicon-remove"></i>&nbsp;</a><a ng-click="index.sort.toggle('name', false)" href="">Name
-                            <i ng-show="index.sort.name == 'name'" class="glyphicon pull-right" ng-class="index.sort.rev ? 'glyphicon-arrow-up': 'glyphicon-arrow-down'"></i></a>
+                        <th class="col-md-9" ng-class="{'info': index.sort.name == 'name'}"><a title="Reset sort" class="pull-left" href="" ng-style="{'visibility': index.sort.name ? 'visible' : 'hidden'}" ng-click="index.sort.reset()"><i class="glyphicon glyphicon-sort"></i>&nbsp;</a><a ng-click="index.sort.toggle('name', false)" href="">Name
+                            <i ng-show="index.sort.name == 'name'" class="glyphicon pull-right" ng-class="index.sort.rev ? 'glyphicon-sort-by-alphabet-alt': 'glyphicon-sort-by-alphabet'"></i></a>
                         </th>
                         <th class="col-md-2" ng-class="{'info': index.sort.name == 'mtime'}"><a ng-click="index.sort.toggle('mtime', true)" href="">Time
-                            <i ng-show="index.sort.name == 'mtime'" class="glyphicon pull-right" ng-class="index.sort.rev ? 'glyphicon-arrow-up': 'glyphicon-arrow-down'"></i></a>
+                            <i ng-show="index.sort.name == 'mtime'" class="glyphicon pull-right" ng-class="index.sort.rev ? 'glyphicon-sort-by-order-alt': 'glyphicon-sort-by-order'"></i></a>
                         </th>
                         <th class="col-md-1" ng-class="{'info': index.sort.name == 'size'}"><a ng-click="index.sort.toggle('size', false)" href="">Size
-                            <i ng-show="index.sort.name == 'size'" class="glyphicon pull-right" ng-class="index.sort.rev ? 'glyphicon-arrow-up': 'glyphicon-arrow-down'"></i></a>
+                            <i ng-show="index.sort.name == 'size'" class="glyphicon pull-right" ng-class="index.sort.rev ? 'glyphicon-sort-by-attributes-alt': 'glyphicon-sort-by-attributes'"></i></a>
                         </th>
                     </thead>
                     <tbody>
