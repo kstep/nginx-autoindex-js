@@ -86,6 +86,8 @@ function ($http, $location, $scope, window, $timeout, FILES_BASE_URL) {
         reset: function () {
             this.rev = false;
             this.name = null;
+
+            this.save();
         },
         toggle: function (col, rev) {
             if (this.name == col) {
@@ -94,6 +96,17 @@ function ($http, $location, $scope, window, $timeout, FILES_BASE_URL) {
                 this.name = col;
                 this.rev = rev;
             }
+
+            this.save();
+        },
+        save: function () {
+            window.localStorage.setItem('sortName', this.name || '');
+            window.localStorage.setItem('sortRev', this.rev? '1': '');
+        },
+        load: function () {
+            this.name = window.localStorage.getItem('sortName');
+            this.rev = !!window.localStorage.getItem('sortRev');
+            console.log(this);
         }
     };
 
@@ -187,7 +200,9 @@ function ($http, $location, $scope, window, $timeout, FILES_BASE_URL) {
     }
 
     function initialize(config) {
+        self.sort.load();
         self.loading.start();
+
         $http({
             url: config || 'config.json',
             method: 'GET'
