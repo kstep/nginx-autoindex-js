@@ -1,3 +1,4 @@
 {
-    "base_index_url": ""
+    "base_index_url": "",
+    "tail_slash": false
 }

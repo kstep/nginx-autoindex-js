@@ -169,7 +169,7 @@ function ($http, $location, $scope, window, $timeout, FILES_BASE_URL) {
 
         return $http({
             method: 'GET',
-            url: self.config.base_index_url + (path || '')
+            url: self.config.base_index_url + (path || '') + (self.config.tail_slash? '/': '')
         }).then(function (response) {
             var files = response.data || [];
 
@@ -210,7 +210,8 @@ function ($http, $location, $scope, window, $timeout, FILES_BASE_URL) {
             self.loading.stop();
 
             self.config = response.data || {
-                base_index_url: ""
+                base_index_url: "",
+                tail_slash: false
             };
 
             $scope.$on('$locationChangeSuccess', function () {
