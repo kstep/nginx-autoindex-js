@@ -55,7 +55,7 @@
                             <td></td>
                         </tr>
                         <tr ng-repeat="row in index.files | orderBy:index.sort.name:index.sort.rev">
-                            <td><a href="{{:: row.type == 'directory' ? '#' : '' }}{{:: index.path }}/{{:: row.name }}"><i class="glyphicon" ng-class="::{ 'glyphicon-folder-close': row.type == 'directory', 'glyphicon-file': row.type == 'file', 'glyphicon-question-sign': row.type == 'other' }"></i> {{:: row.name }}</a></td>
+                            <td><a href="{{:: row.type == 'directory' ? '#' : index.config.base_index_url }}{{:: index.path }}/{{:: row.name }}"><i class="glyphicon" ng-class="::{ 'glyphicon-folder-close': row.type == 'directory', 'glyphicon-file': row.type == 'file', 'glyphicon-question-sign': row.type == 'other' }"></i> {{:: row.name }}</a></td>
                             <td>{{:: row.mtime | date:'short' }}</td>
                             <td><span title="{{:: row.size }}" ng-bind=":: row.size | humanize" ng-if=":: row.size != undefined"></span></td>
                         </tr>
