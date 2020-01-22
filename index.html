@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <html ng-app="index">
     <head>
-        <title ng-bind-template="{{ $$childTail.index.path }} ({{ $$childTail.index.files.length }}) — Files Index">Files Index</title>
+        <title ng-bind-template="{{ $$childTail.index.config.page_title }} - {{ $$childTail.index.path }} ({{ $$childTail.index.files.length }})">Files Index</title>
         <script src="lib/angular.min.js"></script>
         <link type="text/css" rel="stylesheet" href="lib/bootstrap.min.css" />
         <meta charset="utf-8" />
@@ -209,6 +209,7 @@ function ($http, $location, $scope, window, $timeout, FILES_BASE_URL) {
             self.loading.stop();
 
             self.config = response.data || {
+                page_title: "Files Index",
                 base_index_url: "",
                 tail_slash: false
             };

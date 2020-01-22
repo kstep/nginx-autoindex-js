@@ -1,4 +1,5 @@
 {
-    "base_index_url": "",
-    "tail_slash": false
+    "page_title": "Files Index",
+    "base_index_url": "../files",
+    "tail_slash": true
 }
