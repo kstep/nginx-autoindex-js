@@ -211,8 +211,12 @@ function ($http, $location, $scope, window, $timeout, FILES_BASE_URL) {
             self.config = response.data || {
                 page_title: "Files Index",
                 base_index_url: "",
-                tail_slash: false
+                tail_slash: false,
+                default_sort: {name: null, rev: false}
             };
+
+            self.sort.name = self.config.default_sort.name;
+            self.sort.rev = self.config.default_sort.rev;
 
             $scope.$on('$locationChangeSuccess', function () {
                 self.path_parts = path_parts(self.path = $location.path());
