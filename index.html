@@ -41,7 +41,7 @@
                         <th class="col-md-9" ng-class="{'info': index.sort.name == 'name'}"><a title="Reset sort" class="pull-left" href="" ng-style="{'visibility': index.sort.name ? 'visible' : 'hidden'}" ng-click="index.sort.reset()"><i class="glyphicon glyphicon-sort"></i>&nbsp;</a><a ng-click="index.sort.toggle('name', false)" href="">Name
                             <i ng-show="index.sort.name == 'name'" class="glyphicon pull-right" ng-class="index.sort.rev ? 'glyphicon-sort-by-alphabet-alt': 'glyphicon-sort-by-alphabet'"></i></a>
                         </th>
-                        <th class="col-md-2" ng-class="{'info': index.sort.name == 'mtime'}"><a ng-click="index.sort.toggle('mtime', true)" href="">Time
+                        <th class="col-md-2" ng-class="{'info': index.sort.name == 'mtime'}"><a ng-click="index.sort.toggle('mtime', true)" href="">Date modified
                             <i ng-show="index.sort.name == 'mtime'" class="glyphicon pull-right" ng-class="index.sort.rev ? 'glyphicon-sort-by-order-alt': 'glyphicon-sort-by-order'"></i></a>
                         </th>
                         <th class="col-md-1" ng-class="{'info': index.sort.name == 'size'}"><a ng-click="index.sort.toggle('size', false)" href="">Size
@@ -56,7 +56,7 @@
                         </tr>
                         <tr ng-repeat="row in index.files | orderBy:index.sort.name:index.sort.rev">
                             <td><a href="{{:: row.type == 'directory' ? '#' : index.config.base_index_url }}{{:: index.path }}/{{:: row.name }}"><i class="glyphicon" ng-class="::{ 'glyphicon-folder-close': row.type == 'directory', 'glyphicon-file': row.type == 'file', 'glyphicon-question-sign': row.type == 'other' }"></i> {{:: row.name }}</a></td>
-                            <td>{{:: row.mtime | date:'short' }}</td>
+                            <td>{{:: row.mtime | date:'yyyy/MM/dd hh:mm:ss' }}</td>
                             <td><span title="{{:: row.size }}" ng-bind=":: row.size | humanize" ng-if=":: row.size != undefined"></span></td>
                         </tr>
                     </tbody>
